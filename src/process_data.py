@@ -11,6 +11,7 @@ Arguments Description:
 """
 
 import os
+import re
 import sys
 
 import pandas as pd
@@ -96,6 +97,53 @@ def clean_data(df, column):
     return df
 
 
+def check_unique_zero_columns(df):
+    """
+    Checks for columns in the DataFrame that have unique values all equal to
+    zero, and drops these columns from the DataFrame if found.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame to check.
+
+    Returns:
+        pd.DataFrame: The DataFrame with zero-value columns dropped, if any were
+        found.
+    """
+    zero_columns = []
+    for column in df.columns:
+        if df[column].nunique() == 1 and df[column].unique()[0] == 0:
+            zero_columns.append(column)
+
+    if len(zero_columns) > 0:
+        print(
+            f"{len(zero_columns)} columns have unique values all equal to zero"
+        )
+        df = df.drop(zero_columns, axis=1)
+        print(f"Drop {len(zero_columns)} columns")
+
+    else:
+        print(
+            f"{len(zero_columns)} columns have unique values all equal to zero"
+        )
+    return df
+
+
+def replace_urls(message, replacement="urlplaceholder"):
+    """
+    Replace URLs in a given message with a specified replacement string.
+
+    Args:
+        message (str): The input message containing URLs to be replaced.
+        replacement (str, optional): The string to replace URLs with. Default is
+        'urlplaceholder'.
+
+    Returns:
+        str: The message with URLs replaced by the specified replacement string.
+    """
+    url_pattern = r"(https?://\S+|www\.\S+)"
+    return re.sub(url_pattern, replacement, message)
+
+
 def save_sqlite(df, filepath):
     """
     Saves the given DataFrame to an SQLite database.
@@ -130,7 +178,7 @@ def main():
             1:
         ]
 
-        # 1. Loads the messages and categories datasets
+        # Loads the messages and categories datasets
         print(
             "Loading data...\n"
             f"    MESSAGES: {messages_filepath}\n"
@@ -140,21 +188,28 @@ def main():
         messages = load_data(messages_filepath)
         categories = load_data(categories_filepath)
 
-        # 2 Merge datasets
+        # Merge datasets
         print("\nMerging data...")
         df = merge_data(messages, categories, "id")
 
-        # 3. Cleans the data
+        # Cleans the data
         print("\nCleaning data...")
 
         # Split `categories` into separate category columns.
         df = clean_data(df, "categories")
 
-        # 4. Stores it in a SQLite database
+        # Drop columns with unique values equal to zero
+        df = check_unique_zero_columns(df)
+
+        # Replace URLs in a given message
+        print("Search and replace URLs in a column message")
+        df["message"] = df["message"].apply(replace_urls)
+
+        # Stores it in a SQLite database
         print("\nSaving data...")
         save_sqlite(df, database_filepath)
 
-        print("\nCleaned data saved to database!")
+        print("\nCleaned data saved to database!\n")
 
     else:
         print(
