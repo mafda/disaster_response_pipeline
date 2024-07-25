@@ -1,3 +1,14 @@
+"""
+Disaster Response Pipeline Project (Udacity - Data Science Nanodegree)
+
+Train Classifier: python train_classifier.py <path to database file> <path to
+model file> 
+
+Arguments Description:
+    1. File path to the SQLite database.
+    2. File path to the model classifier.
+"""
+
 import os
 import pickle
 import re
@@ -21,6 +32,10 @@ from sklearn.pipeline import FeatureUnion, Pipeline
 from sqlalchemy import create_engine
 
 warnings.simplefilter("ignore")
+
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 
 def load_data(db_filepath):
