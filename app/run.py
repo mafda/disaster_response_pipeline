@@ -1,3 +1,9 @@
+"""
+Disaster Response Pipeline Project (Udacity - Data Science Nanodegree)
+
+Run the web application.
+"""
+
 import json
 import os
 import re
@@ -139,6 +145,14 @@ def go():
 
 
 def main():
+    """
+    Run the web application.
+
+    This function starts the web server for the application, making it
+    accessible on all network interfaces (host="0.0.0.0") and listening on port
+    3000. The server will be run in debug mode, which provides detailed error
+    messages and auto-reload functionality for development purposes.
+    """
     app.run(host="0.0.0.0", port=3000, debug=True)
 
 
