@@ -1,30 +1,53 @@
 import json
 import os
+import re
+from collections import Counter
 
 import joblib
+import nltk
 import pandas as pd
 import plotly
 from flask import Flask, render_template, request
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
 from plotly.graph_objs import Bar
 from sqlalchemy import create_engine
+
+nltk.download("punkt")
+nltk.download("stopwords")
+nltk.download("wordnet")
 
 app = Flask(__name__)
 
 
 def tokenize(text):
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
+    """
+    Process and tokenize text for Natural Language Processing (NLP) tasks.
 
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
+    Args:
+        text (str): The input text string to be tokenized.
 
-    return clean_tokens
+    Returns:
+        list: A list of processed and tokenized words from the input text.
+    """
+    # Normalize text
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
+
+    # tokenize text
+    words = nltk.word_tokenize(text)
+
+    # remove stop words
+    stopwords_ = nltk.corpus.stopwords.words("english")
+    words = [word for word in words if word not in stopwords_]
+
+    # extract root form of words
+    words = [
+        nltk.stem.WordNetLemmatizer().lemmatize(word, pos="v")
+        for word in words
+    ]
+
+    return words
 
 
+# filepaths
 database_filepath = "../data/DisasterResponse.db"
 model_filepath = "../models/classifier_model.pkl"
 
@@ -36,20 +59,33 @@ df = pd.read_sql_table(table_name, engine)
 # load model
 model = joblib.load(model_filepath)
 
-
 # index webpage displays cool visuals and receives user input text for model
 @app.route("/")
 @app.route("/index")
 def index():
 
-    # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
-    genre_counts = df.groupby("genre").count()["message"]
+    # Distribution of Message Genres
+    genre_counts = (
+        df.groupby("genre").count()["message"].sort_values(ascending=False)
+    )
     genre_names = list(genre_counts.index)
 
+    # Distribution of Message Categories
+    category_names = df.iloc[:, 4:].columns
+    category_boolean = (df.iloc[:, 4:] != 0).sum()
+    category_sorted = category_boolean.sort_values(ascending=False)
+
+    # graph - Words frequency
+    all_words = []
+    for text in df["message"]:
+        all_words.extend(tokenize(text))
+    word_counts = Counter(all_words)
+    top_words = word_counts.most_common(10)
+    top_words_df = pd.DataFrame(top_words, columns=["word", "count"])
+
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
+        # graph - Distribution of Message Genres
         {
             "data": [Bar(x=genre_names, y=genre_counts)],
             "layout": {
@@ -57,7 +93,25 @@ def index():
                 "yaxis": {"title": "Count"},
                 "xaxis": {"title": "Genre"},
             },
-        }
+        },
+        # graph - Distribution of Message Categories
+        {
+            "data": [Bar(x=category_names, y=category_sorted)],
+            "layout": {
+                "title": "Distribution of Message Categories",
+                "yaxis": {"title": "Count"},
+                "xaxis": {"title": "Category", "tickangle": 35},
+            },
+        },
+        # graph - Words frequency
+        {
+            "data": [Bar(x=top_words_df["word"], y=top_words_df["count"])],
+            "layout": {
+                "title": "Distribution of Most Frequency Words",
+                "yaxis": {"title": "Frequency"},
+                "xaxis": {"title": "Words", "tickangle": 35},
+            },
+        },
     ]
 
     # encode plotly graphs in JSON
