@@ -81,6 +81,9 @@ def clean_data(df, column):
         # convert category from string to numeric
         categories[category] = categories[category].astype(int)
 
+    # drop not binary columns
+    categories = categories.drop(categories[categories['related'] == 2].index)
+
     # drop the original categories column from `df`
     df.drop([column], axis=1, inplace=True)
 
