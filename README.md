@@ -1,10 +1,15 @@
 # Disaster Response Project
 
-This project involves developing an ETL pipeline integrated with supervised learning and grid search to classify text messages sent during disaster events. 
+This project involves developing an ETL pipeline integrated with supervised
+learning and grid search to classify text messages sent during disaster events. 
 
-It includes an ML pipeline and a web app designed to categorize disaster response messages in real time using Natural Language Processing (NLP) techniques.
+It includes an ML pipeline and a web app designed to categorize disaster
+response messages in real time using Natural Language Processing (NLP)
+techniques.
 
- In this project, I'll apply data engineering skills to analyze disaster data from [Appen](https://www.figure-eight.com/) to build a model for an API that classifies disaster messages.
+ In this project, I'll apply data engineering skills to analyze disaster data
+ from [Appen](https://www.figure-eight.com/) to build a model for an API that
+ classifies disaster messages.
 
 ## Web App
 
@@ -74,7 +79,8 @@ It includes an ML pipeline and a web app designed to categorize disaster respons
 
 **1. ETL Pipeline**
 
-The first part of the data pipeline is the Extract, Transform, and Load process. I will read the dataset, clean the data, and then store it in a SQLite database.
+The first part of the data pipeline is the Extract, Transform, and Load process.
+I will read the dataset, clean the data, and then store it in a SQLite database.
 
 File `src/process_data.py`, contains a data cleaning pipeline that:
 * Loads the `messages.csv` and `categoriescsv` datasets
@@ -84,7 +90,11 @@ File `src/process_data.py`, contains a data cleaning pipeline that:
 
 **2. ML Pipeline**
 
-The second part, I will create a machine learning pipeline that uses NLTK, as well as scikit-learn's Pipeline and GridSearchCV to output a final model that uses the `message` column to predict classifications for 36 categories (multi-output classification). Finally, I will export your model to a pickle file. 
+The second part, I will create a machine learning pipeline that uses NLTK, as
+well as scikit-learn's Pipeline and GridSearchCV to output a final model that
+uses the `message` column to predict classifications for 36 categories
+(multi-output classification). Finally, I will export your model to a pickle
+file. 
 
 File `src/train_classifier.py`, contains a machine learning pipeline that:
 * Loads data from the SQLite database
@@ -98,12 +108,14 @@ File `src/train_classifier.py`, contains a machine learning pipeline that:
 
 In the last step, I'll display your results in a Flask web app.
 
-File `app/run.py` will start the web app where users can enter their query and the machine learning model will categorize this event.
+File `app/run.py` will start the web app where users can enter their query and
+the machine learning model will categorize this event.
 * Show data visualizations using Plotly in the web app.
 
 ## Executing Program
 
-There are 3 steps to follow, from cleaning the data, through training the model, and ending with the web app.
+There are 3 steps to follow, from cleaning the data, through training the model,
+and ending with the web app.
 
 ### 1. Cleaning data
 
