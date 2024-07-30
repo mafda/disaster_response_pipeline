@@ -200,24 +200,25 @@ Standard Deviation:
 
 ## Conclusion
 
-I have chosen **Model 2** as the best model for the following reasons:
+I have chosen **Model 1** as the best model for the following reasons:
 
-* Flexible Architecture: Model 2 introduces a more flexible architecture by
-  incorporating a FeatureUnion, which allows for the integration of multiple
-  feature extraction pipelines. This flexibility enables the potential for
-  incorporating additional feature sets beyond text, making it more adaptable
-  for future enhancements and improvements.
-
-* Comparable Performance: Although Model 1 has a slightly higher mean F1 score
-  (0.935306) compared to Model 2 (0.935085), the difference is marginal. Model
-  2’s mean F1 score is nearly identical to Model 1, and its standard deviation
-  (0.056090) is also very close to that of Model 1 (0.056039). This demonstrates
-  that Model 2 achieves almost the same level of performance as Model 1 in terms
-  of accuracy and consistency.
-
-Given these factors, Model 2 not only offers competitive performance but also
-provides greater flexibility for incorporating additional features in the
-future, making it the most suitable choice for this project.
+* Comparable Performance: The performance metrics are very similar across all
+  three models. **Model 1** achieves a mean F1 score of 0.931143 with a standard
+  deviation of 0.061321, which is very close to the scores of Model 1 (mean F1
+  score of 0.935306 and standard deviation of 0.056039) and Model 3 (mean F1
+  score of 0.935085 and standard deviation of 0.056090). This indicates that
+  **Model 1** performs at a similar level of accuracy and consistency as the other
+  models.
+* Grid Search Optimization: **Model 1** utilizes GridSearchCV for hyperparameter
+  tuning, which systematically searches for the best combination of
+  hyperparameters to optimize model performance. This thorough approach ensures
+  that the model is well-tuned and can potentially achieve better performance in
+  different scenarios. The use of grid search demonstrates a more rigorous and
+  comprehensive method for model optimization.
+  
+Given the similar performance across the models and the added advantage of grid
+search optimization, **Model 1** stands out as the most robust and well-tuned choice
+for this project.
 
 ## References
 
