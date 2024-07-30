@@ -19,23 +19,26 @@ import nltk
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.feature_extraction.text import (
+    CountVectorizer,
+    TfidfTransformer,
+)
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
     precision_score,
     recall_score,
 )
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.pipeline import FeatureUnion, Pipeline
+from sklearn.pipeline import Pipeline
 from sqlalchemy import create_engine
 
 warnings.simplefilter("ignore")
 
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
+nltk.download("punkt")
+nltk.download("stopwords")
+nltk.download("wordnet")
 
 
 def load_data(db_filepath):
@@ -120,32 +123,27 @@ def build_model():
         model (Pipeline): A scikit-learn Pipeline object ready for training and
         prediction.
     """
-    model = Pipeline(
+
+    pipeline = Pipeline(
         [
-            (
-                "features",
-                FeatureUnion(
-                    [
-                        (
-                            "text_pipeline",
-                            Pipeline(
-                                [
-                                    (
-                                        "vect",
-                                        CountVectorizer(tokenizer=tokenize),
-                                    ),
-                                    ("tfidf", TfidfTransformer()),
-                                ]
-                            ),
-                        ),
-                    ]
-                ),
-            ),
+            ("vect", CountVectorizer(tokenizer=tokenize)),
+            ("tfidf", TfidfTransformer()),
             ("clf", MultiOutputClassifier(RandomForestClassifier())),
         ]
     )
 
-    return model
+    param_grid = {
+        "vect__min_df": [1, 5],
+        "tfidf__use_idf": [True, False],
+        "clf__estimator__n_estimators": [10, 25],
+    }
+
+    # Instantiate GridSearchCV
+    grid_search = GridSearchCV(
+        pipeline, param_grid, scoring="f1_micro", verbose=3, cv=3
+    )
+
+    return grid_search
 
 
 def get_evaluate_multioutput(actual, predicted, col_names):
